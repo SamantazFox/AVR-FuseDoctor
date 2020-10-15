@@ -12,8 +12,9 @@
 #include "method_attiny_hvserial.h"
 
 
-void setup()
+void main(void)
 {
+	// Init
 	pinMode(VCC, OUTPUT);
 	pinMode(RST, OUTPUT);
 	pinMode(SDI, OUTPUT);
@@ -22,15 +23,11 @@ void setup()
 	pinMode(SDO, OUTPUT);     // Configured as input when in programming mode
 
 	digitalWrite(RST, HIGH);  // Level shifter is inverting, this shuts off 12V
-	//Serial.begin(19200);
-}
 
-void loop()
-{
-	//if (Serial.available() > 0)
+
+	// Infinite loop
+	while (1)
 	{
-		//Serial.read();
-
 		pinMode(SDO, OUTPUT);     // Set SDO to output
 
 		digitalWrite(SDI, LOW);
@@ -73,5 +70,8 @@ void loop()
 		digitalWrite(SCI, LOW);
 		digitalWrite(VCC, LOW);    // Vcc Off
 		digitalWrite(RST, HIGH);   // 12v Off
+
+
+		delay(10);
 	}
 }
