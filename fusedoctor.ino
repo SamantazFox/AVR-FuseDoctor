@@ -69,22 +69,22 @@ void readFuses ()
 	shiftOut(0x00, 0x68);
 
 	val = shiftOut(0x00, 0x6C);
-	Serial.print("LFuse: ");
-	Serial.print(val, HEX);
+	//Serial.print("LFuse: ");
+	//Serial.print(val, HEX);
 
 	shiftOut(0x04, 0x4C);  // HFuse
 	shiftOut(0x00, 0x7A);
 
 	val = shiftOut(0x00, 0x7E);
-	Serial.print(", HFuse: ");
-	Serial.print(val, HEX);
+	//Serial.print(", HFuse: ");
+	//Serial.print(val, HEX);
 
 	shiftOut(0x04, 0x4C);  // EFuse
 	shiftOut(0x00, 0x6A);
 
 	val = shiftOut(0x00, 0x6E);
-	Serial.print(", EFuse: ");
-	Serial.println(val, HEX);
+	//Serial.print(", EFuse: ");
+	//Serial.println(val, HEX);
 }
 
 uint16_t readSignature ()
@@ -106,11 +106,11 @@ uint16_t readSignature ()
 
 void chipErase(void)
 {
-	Serial.print ("Erasing chip....");
+	//Serial.print ("Erasing chip....");
 	shiftOut(0x80, 0x4C);
 	shiftOut(0x00, 0x64);
 	shiftOut(0x00, 0x6C);
-	Serial.println ("done");
+	//Serial.println ("done");
 }
 
 
@@ -125,14 +125,14 @@ void setup()
 	pinMode(SDO, OUTPUT);     // Configured as input when in programming mode
 
 	digitalWrite(RST, HIGH);  // Level shifter is inverting, this shuts off 12V
-	Serial.begin(19200);
+	//Serial.begin(19200);
 }
 
 void loop()
 {
-	if (Serial.available() > 0)
+	//if (Serial.available() > 0)
 	{
-		Serial.read();
+		//Serial.read();
 
 		pinMode(SDO, OUTPUT);     // Set SDO to output
 
@@ -149,11 +149,11 @@ void loop()
 		pinMode(SDO, INPUT);      // Set SDO to input
 		delayMicroseconds(300);
 
-		Serial.println("Reading: ");
+		//Serial.println("Reading: ");
 		uint16_t sig = readSignature();
 
-		Serial.print("Signature is: ");
-		Serial.println(sig, HEX);
+		//Serial.print("Signature is: ");
+		//Serial.println(sig, HEX);
 
 		readFuses();
 		// chipErase();
