@@ -5,6 +5,10 @@
 // Fuse Calc:
 //   <a rel="nofollow">http://www.rickety.us/2010/03/arduino-avr-high-vo....</a>
 
+
+#include <stdint.h>
+
+
 #define  RST     13    // Output to level shifter for !RESET from transistor
 #define  SCI     12    // Target Clock Input
 #define  SDO     11    // Target Data Output
@@ -26,17 +30,17 @@
 #define  ATTINY85   0x930B  // L: 0x62, H: 0xDF, E: 0xFF    8 pin
 
 
-byte shiftOut (byte val1, byte val2)
+uint8_t shiftOut (uint8_t val1, uint8_t val2)
 {
-	int inBits = 0;
+	uint16_t inBits = 0;
 
 	//Wait until SDO goes high
 	while (!digitalRead(SDO));
 
-	unsigned int dout = (unsigned int) val1 << 2;
-	unsigned int iout = (unsigned int) val2 << 2;
+	uint16_t dout = (uint16_t) val1 << 2;
+	uint16_t iout = (uint16_t) val2 << 2;
 
-	for (int ii = 10; ii >= 0; ii--) 
+	for (uint8_t ii = 10; ii >= 0; ii--)
 	{
 		digitalWrite(SDI, !!(dout & (1 << ii)));
 		digitalWrite(SII, !!(iout & (1 << ii)));
@@ -49,17 +53,17 @@ byte shiftOut (byte val1, byte val2)
 	return inBits >> 2;
 }
 
-void writeFuse (unsigned int fuse, byte val)
+void writeFuse (uint16_t fuse, uint8_t val)
 {
 	shiftOut(0x40, 0x4C);
 	shiftOut( val, 0x2C);
-	shiftOut(0x00, (byte) (fuse >> 8));
-	shiftOut(0x00, (byte) fuse);
+	shiftOut(0x00, (uint8_t) (fuse >> 8));
+	shiftOut(0x00, (uint8_t) fuse);
 }
 
 void readFuses ()
 {
-	byte val;
+	uint8_t val;
 
 	shiftOut(0x04, 0x4C);  // LFuse
 	shiftOut(0x00, 0x68);
@@ -83,12 +87,12 @@ void readFuses ()
 	Serial.println(val, HEX);
 }
 
-unsigned int readSignature ()
+uint16_t readSignature ()
 {
-	unsigned int sig = 0;
-	byte val;
+	uint16_t sig = 0;
+	uint8_t val;
 
-	for (int ii = 1; ii < 3; ii++)
+	for (uint8_t ii = 1; ii < 3; ii++)
 	{
 		shiftOut(0x08, 0x4C);
 		shiftOut(  ii, 0x0C);
@@ -146,7 +150,7 @@ void loop()
 		delayMicroseconds(300);
 
 		Serial.println("Reading: ");
-		unsigned int sig = readSignature();
+		uint16_t sig = readSignature();
 
 		Serial.print("Signature is: ");
 		Serial.println(sig, HEX);
