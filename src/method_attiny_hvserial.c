@@ -1,15 +1,17 @@
-#ifndef __PROGRAM_TINY_HVSERIAL_H__
-#define __PROGRAM_TINY_HVSERIAL_H__
-
+#include "methods.h"
 
 #include <stdint.h>
 
-#define  HFUSE  0x747C
-#define  LFUSE  0x646C
-#define  EFUSE  0x666E
+#define  CMD_HFUSE  0x747C
+#define  CMD_LFUSE  0x646C
+#define  CMD_EFUSE  0x666E
 
 
-uint8_t shiftOut (uint8_t val1, uint8_t val2)
+/*
+ * Static functions specific to this programming method
+*/
+
+static uint8_t shiftOut (uint8_t val1, uint8_t val2)
 {
 	uint16_t inBits = 0;
 
@@ -32,7 +34,7 @@ uint8_t shiftOut (uint8_t val1, uint8_t val2)
 	return inBits >> 2;
 }
 
-void writeFuse (uint16_t fuse, uint8_t val)
+static void writeFuse (uint16_t fuse, uint8_t val)
 {
 	shiftOut(0x40, 0x4C);
 	shiftOut( val, 0x2C);
@@ -40,7 +42,7 @@ void writeFuse (uint16_t fuse, uint8_t val)
 	shiftOut(0x00, (uint8_t) fuse);
 }
 
-void readFuses (void)
+static void readFuses (void)
 {
 	//uint8_t val;
 
@@ -69,7 +71,7 @@ void readFuses (void)
 	_delay_us(5);
 }
 
-uint16_t readSignature (void)
+static uint16_t readSignature (void)
 {
 	uint16_t sig = 0;
 	uint8_t val;
@@ -86,7 +88,7 @@ uint16_t readSignature (void)
 	return sig;
 }
 
-void chipErase(void)
+static void chipErase (void)
 {
 	//Serial.print ("Erasing chip....");
 	shiftOut(0x80, 0x4C);
@@ -96,4 +98,55 @@ void chipErase(void)
 }
 
 
-#endif  /* !__PROGRAM_TINY_HVSERIAL_H__ */
+/*
+ * Main routine, called from main
+*/
+
+void attiny_hvserial__detectAndFlash (void)
+{
+	// Enter programming mode
+	pinMode(SDO, OUTPUT);     // Set SDO to output
+
+	digitalWrite(SDI, LOW);   // Set "Prog_enable[0]" to 0 (for 8-pins ATtinys)
+	digitalWrite(SII, LOW);   // Set "Prog_enable[1]" to 0 (for 8-pins ATtinys)
+	digitalWrite(SDO, LOW);   // Set "Prog_enable[2]" to 0 (for 8-pins ATtinys)
+
+	digitalWrite(RST, HIGH);  // 12v Off
+	digitalWrite(VCC, HIGH);  // Vcc On
+	_delay_us(20);
+
+	digitalWrite(RST, LOW);   // 12v On
+	_delay_us(10);
+
+	pinMode(SDO, INPUT);      // Set SDO back to input
+	_delay_us(300);
+
+	// Read signature
+	uint16_t sig = readSignature();
+
+	// Browse signatures
+	for (int i = 0; i < mcu_list_length; i++)
+	{
+		// Make sure to avoid MCUs not supporting this mode
+		if (list_of_mcus[i].method != TINY_HVSERIAL) continue;
+
+		// Check signature, and flash in case of match
+		if (list_of_mcus[i].signature == sig)
+		{
+			// Write low fuse
+			writeFuse(CMD_LFUSE, list_of_mcus[i].lfuse);
+
+			// Write high fuse
+			writeFuse(CMD_HFUSE, list_of_mcus[i].hfuse);
+
+			// If MCU has it, write extended fuse
+			if (list_of_mcus[i].efuse != 0x00)
+				writeFuse(CMD_EFUSE, list_of_mcus[i].efuse);
+		}
+	}
+
+	// Exit programming mode
+	digitalWrite(SCI, LOW);
+	digitalWrite(VCC, LOW);    // Vcc Off
+	digitalWrite(RST, HIGH);   // 12v Off
+}

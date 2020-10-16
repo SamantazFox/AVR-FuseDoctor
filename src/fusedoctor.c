@@ -13,7 +13,7 @@
 
 #include "pindefs.h"
 #include "known_devices.h"
-#include "method_attiny_hvserial.h"
+#include "methods.h"
 
 
 int main(void)
@@ -32,50 +32,10 @@ int main(void)
 	// Infinite loop
 	while (1)
 	{
-		pinMode(SDO, OUTPUT);     // Set SDO to output
+		// Try to program MCUs supportin "HV serial" method
+		attiny_hvserial__detectAndFlash();
 
-		digitalWrite(SDI, LOW);
-		digitalWrite(SII, LOW);
-		digitalWrite(SDO, LOW);
-		digitalWrite(RST, HIGH);  // 12v Off
-		digitalWrite(VCC, HIGH);  // Vcc On
-		_delay_us(20);
-
-		digitalWrite(RST, LOW);   // 12v On
-		_delay_us(10);
-
-		pinMode(SDO, INPUT);      // Set SDO to input
-		_delay_us(300);
-
-		//Serial.println("Reading: ");
-		uint16_t sig = readSignature();
-
-		//Serial.print("Signature is: ");
-		//Serial.println(sig, HEX);
-
-		readFuses();
-		// chipErase();
-
-		if (sig == ATTINY13)
-		{
-			writeFuse(LFUSE, 0x6A);
-			writeFuse(HFUSE, 0xFF);
-		}
-		else if (sig == ATTINY24 || sig == ATTINY44 || sig == ATTINY84 ||
-		         sig == ATTINY25 || sig == ATTINY45 || sig == ATTINY85)
-		{
-			writeFuse(LFUSE, 0xE2); // writeFuse(LFUSE, 0x62);
-			writeFuse(HFUSE, 0xDF); // Erase EEPROM
-			//writeFuse(HFUSE, 0xDE); // Retain EEPROM
-			writeFuse(EFUSE, 0xFF);
-		}
-
-		readFuses();
-		digitalWrite(SCI, LOW);
-		digitalWrite(VCC, LOW);    // Vcc Off
-		digitalWrite(RST, HIGH);   // 12v Off
-
-
+		// Wait between each try
 		_delay_ms(10000);
 	}
 }

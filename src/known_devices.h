@@ -72,4 +72,8 @@ const PROGMEM known_device_t list_of_mcus[] = {
 };
 
 
+const PROGMEM size_t mcu_list_length =
+	( sizeof(list_of_mcus) / sizeof(known_device_t) );
+
+
 #endif  /* !__KNOWN_DEVICES_H__ */
