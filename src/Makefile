@@ -62,6 +62,7 @@ TARGET = fusedoctor
 
 # List source files here. (C/C++ dependencies are automatically generated.)
 CSRC = fusedoctor.c \
+       known_devices.c \
        method_attiny_hvserial.c
 
 # Optimization level, can be [0, 1, 2, 3, s].
