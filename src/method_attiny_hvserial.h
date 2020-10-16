@@ -4,14 +4,6 @@
 
 #include <stdint.h>
 
-
-#define  RST     13    // Output to level shifter for !RESET from transistor
-#define  SCI     12    // Target Clock Input
-#define  SDO     11    // Target Data Output
-#define  SII     10    // Target Instruction Input
-#define  SDI      9    // Target Data Input
-#define  VCC      8    // Target VCC
-
 #define  HFUSE  0x747C
 #define  LFUSE  0x646C
 #define  EFUSE  0x666E
@@ -48,33 +40,36 @@ void writeFuse (uint16_t fuse, uint8_t val)
 	shiftOut(0x00, (uint8_t) fuse);
 }
 
-void readFuses ()
+void readFuses (void)
 {
-	uint8_t val;
+	//uint8_t val;
 
 	shiftOut(0x04, 0x4C);  // LFuse
 	shiftOut(0x00, 0x68);
 
-	val = shiftOut(0x00, 0x6C);
+	//val = shiftOut(0x00, 0x6C);
 	//Serial.print("LFuse: ");
 	//Serial.print(val, HEX);
+	_delay_us(5);
 
 	shiftOut(0x04, 0x4C);  // HFuse
 	shiftOut(0x00, 0x7A);
 
-	val = shiftOut(0x00, 0x7E);
+	//val = shiftOut(0x00, 0x7E);
 	//Serial.print(", HFuse: ");
 	//Serial.print(val, HEX);
+	_delay_us(5);
 
 	shiftOut(0x04, 0x4C);  // EFuse
 	shiftOut(0x00, 0x6A);
 
-	val = shiftOut(0x00, 0x6E);
+	//val = shiftOut(0x00, 0x6E);
 	//Serial.print(", EFuse: ");
 	//Serial.println(val, HEX);
+	_delay_us(5);
 }
 
-uint16_t readSignature ()
+uint16_t readSignature (void)
 {
 	uint16_t sig = 0;
 	uint8_t val;

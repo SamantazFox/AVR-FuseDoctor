@@ -6,13 +6,17 @@
 //   <a rel="nofollow">http://www.rickety.us/2010/03/arduino-avr-high-vo....</a>
 
 
+
+#include <avr/io.h>
+#include <util/delay.h>
 #include <stdint.h>
 
+#include "pindefs.h"
 #include "known_devices.h"
 #include "method_attiny_hvserial.h"
 
 
-void main(void)
+int main(void)
 {
 	// Init
 	pinMode(VCC, OUTPUT);
@@ -35,13 +39,13 @@ void main(void)
 		digitalWrite(SDO, LOW);
 		digitalWrite(RST, HIGH);  // 12v Off
 		digitalWrite(VCC, HIGH);  // Vcc On
-		delayMicroseconds(20);
+		_delay_us(20);
 
 		digitalWrite(RST, LOW);   // 12v On
-		delayMicroseconds(10);
+		_delay_us(10);
 
 		pinMode(SDO, INPUT);      // Set SDO to input
-		delayMicroseconds(300);
+		_delay_us(300);
 
 		//Serial.println("Reading: ");
 		uint16_t sig = readSignature();
@@ -72,6 +76,6 @@ void main(void)
 		digitalWrite(RST, HIGH);   // 12v Off
 
 
-		delay(10);
+		_delay_ms(10000);
 	}
 }
