@@ -1,0 +1,15 @@
+# Ignore build artifacts
+.dep
+.obj
+.out
+
+# Ignore KiCad backup/cache/rescue files
+schematics/_autosave*
+schematics/*.bak
+schematics/*.kicad_pcb-bak
+schematics/*-rescue.lib
+schematics/*.sch-bak
+schematics/fp-info-cache
+
+# Ignore zipped gerbers
+gerbers/*.zip
